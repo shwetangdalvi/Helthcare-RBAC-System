@@ -2,6 +2,10 @@
 
 A simplified RBAC system built for a veteran healthcare application to demonstrate secure role-based access and multi-tenant resource scoping.
 
+### Organizational Structure Diagram
+
+![Editor _ Mermaid Chart-2025-04-22-202815](https://github.com/user-attachments/assets/ac1b7c1b-5cc3-4e6e-bc16-ebfc6a760d0b)
+
 ---
 
 ## 1. Setup Instructions
@@ -52,37 +56,41 @@ Includes:
 ---
 
 ## 2. API Documentation
+**Note: If there is no user in the database, then the system will respond with 403 permission denied. (We can create users by a seed script.)
+        The seed script only creates the required users and resources for testing.
 
+Dev Environment: http://localhost:3000/
+ 
 ### `/records` – List all accessible records
 
+Case: Owner - Level 1
 ```http
-GET /records?user_email=admin@hospital.com
+GET /records?user_email=owner@hospital.com
 ```
+Returns only those records the user has permission to access. (in owner of level 1 case all)
 
-Returns only those records the user has permission to access.
+Case: Owner - Level 2
+```http
+GET /records?user_email=viewer@pediatrics.com
+```
+Returns only those records the user has permission to access. (in owner of level 2 case only level 2 records)
 
 ### `/records/:id` – View a specific record
-
 ```http
-GET /records/uuid-record-radiology-1?user_email=viewer@radiology.com
+GET /records/:id?user_email=viewer@clinic.com
 ```
-
 Returns a single resource if the user has read access.
 
 ### `/permissions/check` – Check permission for a user
-
 ```http
-GET /permissions/check?user_email=viewer@radiology.com&resource_id=uuid-record-radiology-1&permission=read
+GET /permissions/check?user_email=admin@hospital.com&resource_id=123&permission=read
 ```
-
 Returns `{ granted: true | false }`
 
 ### `/audit/logs` – View access attempt logs
-
 ```http
 GET /audit/logs
 ```
-
 Returns list of access audit entries.
 
 ---
@@ -90,8 +98,7 @@ Returns list of access audit entries.
 ## 3. Data Model Overview
 
 ### Diagrams:
-- ![Organization Hierarchy Diagram](./assets/org-hierarchy.png)
-- ![Entity-Relationship Diagram](./assets/erd-diagram.png)
+- ![Editor _ Mermaid Chart-2025-04-21-031534](https://github.com/user-attachments/assets/1437889d-b8ae-40a4-9ef0-1ccc0f7e27c7)
 
 ### Entity Descriptions
 
