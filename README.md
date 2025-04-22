@@ -21,17 +21,16 @@ A simplified RBAC system built for a veteran healthcare application to demonstra
 ```bash
 npm install
 ```
+### Run Seed Script (prepopulates users, roles, orgs, resources)
+
+```bash
+npm run seed
+```
 
 ### Running the App
 
 ```bash
 npm run start:dev
-```
-
-### Run Seed Script (prepopulates users, roles, orgs, resources)
-
-```bash
-npm run seed
 ```
 
 ### Running Tests
