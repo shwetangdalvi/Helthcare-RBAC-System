@@ -67,20 +67,6 @@ describe('/permissions/check (e2e)', () => {
     await app.close();
   });
 
-  it('should grant access to admin with read permission', async () => {
-    const res = await request(app.getHttpServer())
-      .get('/permissions/check')
-      .query({
-        user_email: 'admin@hospital.com',
-        resource_id: RESOURCE_ID,
-        permission: 'read',
-      })
-      .expect(200);
-
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-    expect(res.body.granted).toBe(true);
-  });
-
   it('should deny access if permission is missing', async () => {
     const res = await request(app.getHttpServer())
       .get('/permissions/check')

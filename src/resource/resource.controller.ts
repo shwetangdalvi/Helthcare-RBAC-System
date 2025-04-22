@@ -10,6 +10,7 @@ import { Repository } from 'typeorm';
 import { Resource } from './resource.entity';
 import { User } from '../user/user.entity';
 import { AccessControlService } from '../access-control/access-control.service';
+import { AuditService } from '../audit/audit.service';
 
 @Controller('records')
 export class ResourceController {
@@ -21,6 +22,7 @@ export class ResourceController {
     private readonly userRepo: Repository<User>,
 
     private readonly accessControl: AccessControlService,
+    private readonly auditService: AuditService,
   ) {}
 
   @Get()
@@ -49,7 +51,20 @@ export class ResourceController {
       relations: ['owner', 'organization', 'organization.parent'],
     });
 
-    return this.accessControl.filterResourcesForUser(user, allRecords, 'read');
+    const accessible = allRecords.filter((record) => {
+      const granted = this.accessControl.canAccessResource(user, record, 'read');
+
+      this.auditService.logAccessAttempt({
+        userEmail: user.email,
+        resourceId: record.resource_id,
+        permission: 'read',
+        granted,
+      });
+
+      return granted;
+    });
+
+    return accessible;
   }
 
   @Get(':id')
@@ -84,11 +99,14 @@ export class ResourceController {
       throw new ForbiddenException('Record not found');
     }
 
-    const canAccess = this.accessControl.canAccessResource(
-      user,
-      record,
-      'read',
-    );
+    const canAccess = this.accessControl.canAccessResource(user, record, 'read');
+
+    this.auditService.logAccessAttempt({
+      userEmail: user.email,
+      resourceId: id,
+      permission: 'read',
+      granted: canAccess,
+    });
 
     if (!canAccess) {
       throw new ForbiddenException('Access denied to this record');
