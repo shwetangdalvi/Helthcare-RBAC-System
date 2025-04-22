@@ -1,141 +1,303 @@
 {
-  "info": {
-    "_postman_id": "rbac-healthcare-collection",
-    "name": "RBAC Healthcare API Tests",
-    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
-    "description": "This Postman collection tests all core RBAC scenarios: role-based access, org-level hierarchy, and audit logging."
-  },
-  "item": [
-    {
-      "name": "Permission Check - Viewer (Allowed)",
-      "request": {
-        "method": "GET",
-        "header": [],
-        "url": {
-          "raw": "http://localhost:3000/permissions/check?user_email=viewer@radiology.com&resource_id=uuid-record-radiology-1&permission=read",
-          "protocol": "http",
-          "host": ["localhost"],
-          "port": "3000",
-          "path": ["permissions", "check"],
-          "query": [
-            { "key": "user_email", "value": "viewer@radiology.com" },
-            { "key": "resource_id", "value": "uuid-record-radiology-1" },
-            { "key": "permission", "value": "read" }
-          ]
-        },
-        "description": "✅ Viewer accessing own department's record with 'read' permission. Should return granted: true."
-      }
-    },
-    {
-      "name": "Permission Check - Viewer (Denied - Update)",
-      "request": {
-        "method": "GET",
-        "header": [],
-        "url": {
-          "raw": "http://localhost:3000/permissions/check?user_email=viewer@radiology.com&resource_id=uuid-record-radiology-1&permission=update",
-          "protocol": "http",
-          "host": ["localhost"],
-          "port": "3000",
-          "path": ["permissions", "check"],
-          "query": [
-            { "key": "user_email", "value": "viewer@radiology.com" },
-            { "key": "resource_id", "value": "uuid-record-radiology-1" },
-            { "key": "permission", "value": "update" }
-          ]
-        },
-        "description": "❌ Viewer trying to update a record. Should be denied due to lack of permission."
-      }
-    },
-    {
-      "name": "Permission Check - Admin (Denied - Cross Org)",
-      "request": {
-        "method": "GET",
-        "header": [],
-        "url": {
-          "raw": "http://localhost:3000/permissions/check?user_email=admin@lab.com&resource_id=uuid-record-radiology-1&permission=read",
-          "protocol": "http",
-          "host": ["localhost"],
-          "port": "3000",
-          "path": ["permissions", "check"],
-          "query": [
-            { "key": "user_email", "value": "admin@lab.com" },
-            { "key": "resource_id", "value": "uuid-record-radiology-1" },
-            { "key": "permission", "value": "read" }
-          ]
-        },
-        "description": "❌ Admin from Lab trying to read Radiology record. Denied due to no hierarchy."
-      }
-    },
-    {
-      "name": "Permission Check - Owner (Allowed - Cross Dept)",
-      "request": {
-        "method": "GET",
-        "header": [],
-        "url": {
-          "raw": "http://localhost:3000/permissions/check?user_email=owner@hospital.com&resource_id=uuid-record-radiology-1&permission=read",
-          "protocol": "http",
-          "host": ["localhost"],
-          "port": "3000",
-          "path": ["permissions", "check"],
-          "query": [
-            { "key": "user_email", "value": "owner@hospital.com" },
-            { "key": "resource_id", "value": "uuid-record-radiology-1" },
-            { "key": "permission", "value": "read" }
-          ]
-        },
-        "description": "✅ Owner accessing child department's record. Should be allowed."
-      }
-    },
-    {
-      "name": "List Records - Viewer",
-      "request": {
-        "method": "GET",
-        "header": [],
-        "url": {
-          "raw": "http://localhost:3000/records?user_email=viewer@pediatrics.com",
-          "protocol": "http",
-          "host": ["localhost"],
-          "port": "3000",
-          "path": ["records"],
-          "query": [
-            { "key": "user_email", "value": "viewer@pediatrics.com" }
-          ]
-        },
-        "description": "📋 Lists only records the Viewer in Pediatrics can access. Should exclude records from Radiology, Lab, etc."
-      }
-    },
-    {
-      "name": "Single Record - Denied",
-      "request": {
-        "method": "GET",
-        "header": [],
-        "url": {
-          "raw": "http://localhost:3000/records/uuid-record-vip?user_email=viewer@lab.com",
-          "protocol": "http",
-          "host": ["localhost"],
-          "port": "3000",
-          "path": ["records", "uuid-record-vip"],
-          "query": [
-            { "key": "user_email", "value": "viewer@lab.com" }
-          ]
-        },
-        "description": "❌ Viewer from Lab trying to access top-level Hospital VIP record. Should be denied."
-      }
-    },
-    {
-      "name": "Audit Logs - View",
-      "request": {
-        "method": "GET",
-        "header": [],
-        "url": {
-          "raw": "http://localhost:3000/audit/logs",
-          "protocol": "http",
-          "host": ["localhost"],
-          "port": "3000",
-          "path": ["audit", "logs"]
-        },
-        "description": "📊 View audit log of all access attempts including grants and denials."
-      }
-    }
-  ]
+	"info": {
+		"_postman_id": "e307880a-7d26-460b-9ff4-4d72c512cdc0",
+		"name": "RBAC Healthcare API Tests",
+		"description": "This Postman collection tests all core RBAC scenarios: role-based access, org-level hierarchy, and audit logging.",
+		"schema": "https://schema.getpostman.com/json/collection/v2.0.0/collection.json",
+		"_exporter_id": "44296070",
+		"_collection_link": "https://shwetang-4919336.postman.co/workspace/Shwetang's-Workspace~434b64e0-4f85-4b93-8f3f-a1e88a960c5a/collection/44296070-e307880a-7d26-460b-9ff4-4d72c512cdc0?action=share&source=collection_link&creator=44296070"
+	},
+	"item": [
+		{
+			"name": "List Records - Admin - Level 1",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:3000/records?user_email=viewer@pediatrics.com",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"records"
+					],
+					"query": [
+						{
+							"key": "user_email",
+							"value": "viewer@pediatrics.com"
+						}
+					]
+				},
+				"description": "Lists only records the Viewer in Pediatrics can access. Should exclude records from Radiology, Lab, etc."
+			},
+			"response": []
+		},
+		{
+			"name": "List Records - Viewer - Level 2",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:3000/records?user_email=viewer@pediatrics.com",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"records"
+					],
+					"query": [
+						{
+							"key": "user_email",
+							"value": "viewer@pediatrics.com"
+						}
+					]
+				},
+				"description": "Lists only records the Viewer in Pediatrics can access. Should exclude records from Radiology, Lab, etc."
+			},
+			"response": []
+		},
+		{
+			"name": "Single Record - Allowed",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:3000/records/uuid-record-radiology-1?user_email=viewer@radiology.com",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"records",
+						"uuid-record-radiology-1"
+					],
+					"query": [
+						{
+							"key": "user_email",
+							"value": "viewer@radiology.com"
+						}
+					]
+				},
+				"description": "Viewer from Lab trying to access top-level Hospital VIP record. Should be denied."
+			},
+			"response": []
+		},
+		{
+			"name": "Single Record - Denied",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:3000/records/uuid-record-vip?user_email=viewer@lab.com",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"records",
+						"uuid-record-vip"
+					],
+					"query": [
+						{
+							"key": "user_email",
+							"value": "viewer@lab.com"
+						}
+					]
+				},
+				"description": "Viewer from Lab trying to access top-level Hospital VIP record. Should be denied."
+			},
+			"response": []
+		},
+		{
+			"name": "Permission Check - Viewer (Allowed)",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:3000/permissions/check?user_email=viewer@radiology.com&resource_id=uuid-record-radiology-1&permission=read",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"permissions",
+						"check"
+					],
+					"query": [
+						{
+							"key": "user_email",
+							"value": "viewer@radiology.com"
+						},
+						{
+							"key": "resource_id",
+							"value": "uuid-record-radiology-1"
+						},
+						{
+							"key": "permission",
+							"value": "read"
+						}
+					]
+				},
+				"description": "Viewer accessing own department's record with 'read' permission. Should return granted: true."
+			},
+			"response": []
+		},
+		{
+			"name": "Permission Check - Viewer (Denied - Update)",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:3000/permissions/check?user_email=viewer@radiology.com&resource_id=uuid-record-radiology-1&permission=update",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"permissions",
+						"check"
+					],
+					"query": [
+						{
+							"key": "user_email",
+							"value": "viewer@radiology.com"
+						},
+						{
+							"key": "resource_id",
+							"value": "uuid-record-radiology-1"
+						},
+						{
+							"key": "permission",
+							"value": "update"
+						}
+					]
+				},
+				"description": "Viewer trying to update a record. Should be denied due to lack of permission."
+			},
+			"response": []
+		},
+		{
+			"name": "Permission Check - Admin (Update)",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:3000/permissions/check?user_email=viewer@radiology.com&resource_id=uuid-record-radiology-1&permission=update",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"permissions",
+						"check"
+					],
+					"query": [
+						{
+							"key": "user_email",
+							"value": "viewer@radiology.com"
+						},
+						{
+							"key": "resource_id",
+							"value": "uuid-record-radiology-1"
+						},
+						{
+							"key": "permission",
+							"value": "update"
+						}
+					]
+				},
+				"description": "Viewer trying to update a record. Should be denied due to lack of permission."
+			},
+			"response": []
+		},
+		{
+			"name": "Permission Check - Admin (Denied - Cross Org)",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:3000/permissions/check?user_email=admin@lab.com&resource_id=uuid-record-radiology-1&permission=read",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"permissions",
+						"check"
+					],
+					"query": [
+						{
+							"key": "user_email",
+							"value": "admin@lab.com"
+						},
+						{
+							"key": "resource_id",
+							"value": "uuid-record-radiology-1"
+						},
+						{
+							"key": "permission",
+							"value": "read"
+						}
+					]
+				},
+				"description": "Admin from Lab trying to read Radiology record. Denied due to no hierarchy."
+			},
+			"response": []
+		},
+		{
+			"name": "Permission Check - Owner (Allowed - Cross Dept)",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:3000/permissions/check?user_email=owner@hospital.com&resource_id=uuid-record-radiology-1&permission=read",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"permissions",
+						"check"
+					],
+					"query": [
+						{
+							"key": "user_email",
+							"value": "owner@hospital.com"
+						},
+						{
+							"key": "resource_id",
+							"value": "uuid-record-radiology-1"
+						},
+						{
+							"key": "permission",
+							"value": "read"
+						}
+					]
+				},
+				"description": "Owner accessing child department's record. Should be allowed."
+			},
+			"response": []
+		},
+		{
+			"name": "Audit Logs - View",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": "http://localhost:3000/audit/logs",
+				"description": "📊 View audit log of all access attempts including grants and denials."
+			},
+			"response": []
+		}
+	]
 }
