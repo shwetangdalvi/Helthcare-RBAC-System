@@ -76,13 +76,13 @@ Returns only those records the user has permission to access. (in owner of level
 
 ### `/records/:id` – View a specific record
 ```http
-GET /records/:id?user_email=viewer@clinic.com
+GET /records/uuid-record-radiology-1?user_email=viewer@radiology.com
 ```
 Returns a single resource if the user has read access.
 
 ### `/permissions/check` – Check permission for a user
 ```http
-GET /permissions/check?user_email=admin@hospital.com&resource_id=123&permission=read
+GET /permissions/check?user_email=admin@radiology.com&resource_id=uuid-record-radiology-1&permission=update
 ```
 Returns `{ granted: true | false }`
 
